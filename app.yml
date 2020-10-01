@@ -19,7 +19,7 @@ steps:
       type: Orchestrator::MainWithWorkers
       deploy_to_main: true
       deploy_to_workers: true
-      container_user: {{ workspace.user.uid }}:{{ workspace.user.gid }}
+      container_user: "{{ workspace.user.uid }}:{{ workspace.user.gid }}"
       container_workdir: /work
       engine_mount: /etc/ocean
       data_stores_mount: {{ orchestrator.container.workdir }}
