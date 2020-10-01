@@ -6,7 +6,7 @@ steps:
   - name: spark
     variables:
       - name: spark_master_host
-        value: {{ deployment.nodes.main.private_ip }}
+        value: "{{ deployment.nodes.main.private_ip }}"
       - name: spark_master_port
         value: reserve_port()
       - name: spark_master_ui_port
@@ -22,10 +22,10 @@ steps:
       container_user: "{{ workspace.user.uid }}:{{ workspace.user.gid }}"
       container_workdir: /work
       engine_mount: /etc/ocean
-      data_stores_mount: {{ orchestrator.container.workdir }}
-      ssh_mount: /home/{{ workspace.user.name }}/.ssh
-      main_command: sudo {{ orchestrator.engine_mount }}/master_startup.sh
-      worker_command: sudo {{ orchestrator.engine_mount }}/worker_startup.sh
+      data_stores_mount: "{{ orchestrator.container.workdir }}"
+      ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
+      main_command: "sudo {{ orchestrator.engine_mount }}/master_startup.sh"
+      worker_command: "sudo {{ orchestrator.engine_mount }}/worker_startup.sh"
       snapshot_definition:
         registry_name: docker_hub
         image_name: filebrowser/filebrowser
@@ -34,7 +34,7 @@ steps:
       buttons:
         - node_target: main
           label: Spark Master UI
-          url: http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}
+          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}"
         - node_target: workers
           label: Spark Worker UI
-          url: http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}
+          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}"
