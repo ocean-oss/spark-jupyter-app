@@ -2,83 +2,84 @@
 ocean:
   version: "1"
 steps:
-- engines:
-  - name: spark
-    variables:
-      - name: spark_master_host
-        value: "{{ deployment.nodes.main.private_ip }}"
-      - name: spark_master_port
-        value: reserve_port()
-      - name: spark_master_ui_port
-        value: reserve_port()
-      - name: spark_worker_port
-        value: reserve_port()
-      - name: spark_worker_ui_port
-        value: reserve_port()
-    orchestrator:
-      snapshot_definition:
-        registry_name: docker_hub
-        image_name: jupyter/all-spark-notebook
-        snapshot_name: latest
-      type: Orchestrator::MainWithWorkers
-      deploy_to_main: true
-      deploy_to_workers: true
-      container_user: root
-      container_workdir: /work
-      engine_mount: /etc/ocean
-      data_stores_mount: "{{ orchestrator.container.workdir }}"
-      ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-      main_command: "sudo {{ orchestrator.container.mounts.engine }}/master_startup.sh"
-      worker_command: "sudo {{ orchestrator.container.mounts.engine }}/worker_startup.sh"
-    views:
-      buttons:
-        - node_target: main
-          label: Spark Master UI
-          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}"
-        - node_target: workers
-          label: Spark Worker UI
-          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}"
-  - name: jupyter
-    variables:
-      - name: spark_master_url
-        value: "spark://{{ app.launched_engines.spark.vars.spark_master_host }}:{{ app.launched_engines.spark.vars.spark_master_port }}"
-      - name: jupyter_port
-        value: reserve_port()
-    orchestrator:
-      snapshot_definition:
-        registry_name: docker_hub
-        image_name: jupyter/all-spark-notebook
-        snapshot_name: latest
-      type: Orchestrator::MainWithWorkers
-      deploy_to_main: true
-      deploy_to_workers: false
-      container_user: root
-      container_workdir: /work
-      engine_mount: /etc/ocean
-      data_stores_mount: "{{ orchestrator.container.workdir }}"
-      ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-      main_command: "{{ orchestrator.container.mounts.engine }}/startup.sh"
-      main_env_vars:
-        - name: NB_USER
-          value: "{{ workspace.user.name }}"
-        - name: NB_GROUP
-          value: "{{ workspace.user.group }}"
-        - name: NB_UID
-          value: "{{ workspace.user.uid }}"
-        - name: NB_GID
-          value: "{{ workspace.user.gid }}"
-        - name: GRANT_SUDO
-          value: yes
-        - name: RESTARTABLE
-          value: yes
-        - name: TINI_SUBREAPER
-          value: true
-        - name: CHOWN_HOME
-          value: yes
-        - name: SPARK_MASTER
-          value: "{{ vars.spark_master_url }}"
-    views:
-      buttons:
-        - node_target: main
-          label: Jupyter Notebook
-          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.jupyter_port }}"
+  - engines:
+    - name: spark
+      variables:
+        - name: spark_master_host
+          value: "{{ deployment.nodes.main.private_ip }}"
+        - name: spark_master_port
+          value: reserve_port()
+        - name: spark_master_ui_port
+          value: reserve_port()
+        - name: spark_worker_port
+          value: reserve_port()
+        - name: spark_worker_ui_port
+          value: reserve_port()
+      orchestrator:
+        snapshot_definition:
+          registry_name: docker_hub
+          image_name: jupyter/all-spark-notebook
+          snapshot_name: latest
+        type: Orchestrator::MainWithWorkers
+        deploy_to_main: true
+        deploy_to_workers: true
+        container_user: root
+        container_workdir: /work
+        engine_mount: /etc/ocean
+        data_stores_mount: "{{ orchestrator.container.workdir }}"
+        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
+        main_command: "sudo {{ orchestrator.container.mounts.engine }}/master_startup.sh"
+        worker_command: "sudo {{ orchestrator.container.mounts.engine }}/worker_startup.sh"
+      views:
+        buttons:
+          - node_target: main
+            label: Spark Master UI
+            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}"
+          - node_target: workers
+            label: Spark Worker UI
+            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}"
+  - engines:
+    - name: jupyter
+      variables:
+        - name: spark_master_url
+          value: "spark://{{ app.launched_engines.spark.vars.spark_master_host }}:{{ app.launched_engines.spark.vars.spark_master_port }}"
+        - name: jupyter_port
+          value: reserve_port()
+      orchestrator:
+        snapshot_definition:
+          registry_name: docker_hub
+          image_name: jupyter/all-spark-notebook
+          snapshot_name: latest
+        type: Orchestrator::MainWithWorkers
+        deploy_to_main: true
+        deploy_to_workers: false
+        container_user: root
+        container_workdir: /work
+        engine_mount: /etc/ocean
+        data_stores_mount: "{{ orchestrator.container.workdir }}"
+        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
+        main_command: "{{ orchestrator.container.mounts.engine }}/startup.sh"
+        main_env_vars:
+          - name: NB_USER
+            value: "{{ workspace.user.name }}"
+          - name: NB_GROUP
+            value: "{{ workspace.user.group }}"
+          - name: NB_UID
+            value: "{{ workspace.user.uid }}"
+          - name: NB_GID
+            value: "{{ workspace.user.gid }}"
+          - name: GRANT_SUDO
+            value: yes
+          - name: RESTARTABLE
+            value: yes
+          - name: TINI_SUBREAPER
+            value: true
+          - name: CHOWN_HOME
+            value: yes
+          - name: SPARK_MASTER
+            value: "{{ vars.spark_master_url }}"
+      views:
+        buttons:
+          - node_target: main
+            label: Jupyter Notebook
+            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.jupyter_port }}"
