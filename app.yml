@@ -80,11 +80,5 @@ steps:
     views:
       buttons:
         - node_target: main
-          label: Spark Master UI
-          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}"
-        - node_target: workers
-          label: Spark Worker UI
-          url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}"
-        - node_target: main
           label: Jupyter Notebook
           url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.jupyter_port }}"
