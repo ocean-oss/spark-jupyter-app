@@ -54,7 +54,7 @@ steps:
         deploy_to_main: true
         deploy_to_workers: false
         container_user: root
-        container_workdir: "/home/{{ workspace.user.name }}"
+        container_workdir: "/work"
         engine_mount: /etc/ocean
         data_stores_mount: "{{ orchestrator.container.workdir }}"
         ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
