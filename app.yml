@@ -24,8 +24,8 @@ steps:
       engine_mount: /etc/ocean
       data_stores_mount: "{{ orchestrator.container.workdir }}"
       ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-      main_command: "sudo {{ orchestrator.engine_mount }}/master_startup.sh"
-      worker_command: "sudo {{ orchestrator.engine_mount }}/worker_startup.sh"
+      main_command: "sudo {{ orchestrator.container.mounts.engine }}/master_startup.sh"
+      worker_command: "sudo {{ orchestrator.container.mounts.engine }}/worker_startup.sh"
       snapshot_definition:
         registry_name: docker_hub
         image_name: jupyter/all-spark-notebook
