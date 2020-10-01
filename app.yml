@@ -58,7 +58,7 @@ steps:
         engine_mount: /etc/ocean
         data_stores_mount: "{{ orchestrator.container.workdir }}"
         ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-        main_command: "{{ orchestrator.container.mounts.engine }}/startup.sh"
+        main_command: "sudo {{ orchestrator.container.mounts.engine }}/startup.sh"
         main_env_vars:
           - name: NB_USER
             value: "{{ workspace.user.name }}"
