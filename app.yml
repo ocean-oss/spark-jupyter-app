@@ -28,7 +28,7 @@ steps:
       worker_command: "sudo {{ orchestrator.engine_mount }}/worker_startup.sh"
       snapshot_definition:
         registry_name: docker_hub
-        image_name: filebrowser/filebrowser
+        image_name: jupyter/all-spark-notebook
         snapshot_name: latest
     views:
       buttons:
