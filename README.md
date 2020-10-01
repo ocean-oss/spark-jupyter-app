@@ -4,12 +4,12 @@ This app runs a fully-managed Spark cluster of an arbitrary size. It also launch
 
 To access the Spark cluster in your notebooks simply use the `SPARK_MASTER` environment variable:
 
-```python
+~~~
 import os
 from pyspark.sql import SparkSession
 
 session = SparkSession.builder.master(os.environ['SPARK_MASTER']).getOrCreate()
 sc = session.sparkContext
-```
+~~~
 
 You are good to go!
