@@ -1,0 +1,40 @@
+---
+ocean:
+  version: "1"
+steps:
+- engines:
+  - name: spark
+    variables:
+    - name: spark_master_host
+      value: {{ deployment.nodes.main.private_ip }}
+    - name: spark_master_port
+      value: reserve_port()
+    - name: spark_master_ui_port
+      value: reserve_port()
+    - name: spark_worker_port
+      value: reserve_port()
+    - name: spark_worker_ui_port
+      value: reserve_port()
+    orchestrator:
+      type: Orchestrator::MainWithWorkers
+      deploy_to_main: true
+      deploy_to_workers: true
+      container_user: "{{ workspace.user.uid }}:{{ workspace.user.gid }}"
+      container_workdir: "/work"
+      engine_mount: "/etc/ocean"
+      data_stores_mount: "{{ orchestrator.container.workdir }}"
+      ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
+      main_command: sudo {{ orchestrator.engine_mount }}/master_startup.sh
+      worker_command: sudo {{ orchestrator.engine_mount }}/worker_startup.sh
+      snapshot_definition:
+        registry_name: docker_hub
+        image_name: filebrowser/filebrowser
+        snapshot_name: latest
+    views:
+      buttons:
+        - node_target: main
+          label: Spark Master UI
+          url: http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}
+        - node_target: workers
+            label: Spark Worker UI
+            url: http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}
