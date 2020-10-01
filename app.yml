@@ -5,16 +5,16 @@ steps:
 - engines:
   - name: spark
     variables:
-    - name: spark_master_host
-      value: {{ deployment.nodes.main.private_ip }}
-    - name: spark_master_port
-      value: reserve_port()
-    - name: spark_master_ui_port
-      value: reserve_port()
-    - name: spark_worker_port
-      value: reserve_port()
-    - name: spark_worker_ui_port
-      value: reserve_port()
+      - name: spark_master_host
+        value: {{ deployment.nodes.main.private_ip }}
+      - name: spark_master_port
+        value: reserve_port()
+      - name: spark_master_ui_port
+        value: reserve_port()
+      - name: spark_worker_port
+        value: reserve_port()
+      - name: spark_worker_ui_port
+        value: reserve_port()
     orchestrator:
       type: Orchestrator::MainWithWorkers
       deploy_to_main: true
