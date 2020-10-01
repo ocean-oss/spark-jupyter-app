@@ -58,7 +58,7 @@ steps:
       data_stores_mount: "{{ orchestrator.container.workdir }}"
       ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
       main_command: "{{ orchestrator.container.mounts.engine }}/startup.sh"
-      env_vars:
+      main_env_vars:
         - name: NB_USER
           value: "{{ workspace.user.name }}"
         - name: NB_GROUP
