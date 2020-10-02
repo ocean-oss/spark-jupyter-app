@@ -4,7 +4,7 @@ ocean:
 steps:
   - engines:
     - name: spark
-      variables:
+      vars:
         - name: spark_master_host
           value: "{{ engines.spark.deployment.nodes.main.private_ip }}"
         - name: spark_master_port
@@ -47,7 +47,7 @@ steps:
             url: "http://{{ engines.spark.views.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_worker_ui_port }}"
   - engines:
     - name: jupyter
-      variables:
+      vars:
         - name: spark_master_url
           value: "spark://{{ engines.spark.vars.spark_master_host }}:{{ engines.spark.vars.spark_master_port }}"
         - name: jupyter_port
