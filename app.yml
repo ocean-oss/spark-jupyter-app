@@ -16,20 +16,27 @@ steps:
         - name: spark_worker_ui_port
           value: reserve_port()
       orchestrator:
-        snapshot_definition:
-          registry_name: docker_hub
-          image_name: jupyter/all-spark-notebook
-          snapshot_name: latest
         type: Orchestrator::MainWithWorkers
         deploy_to_main: true
         deploy_to_workers: true
-        container_user: root
-        container_workdir: /work
-        engine_mount: /etc/ocean
-        data_stores_mount: "{{ engines.spark.orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-        main_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
-        worker_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
+        snapshot:
+          registry:
+            name: docker_hub
+          image:
+            name: jupyter/all-spark-notebook
+          name: latest
+        container:
+          user: root
+          workdir: /work
+        mounts:
+          engine: /etc/ocean
+          data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
+          ssh: "/home/{{ workspace.user.name }}/.ssh"
+        nodes:
+          main:
+            command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
+          worker:
+            command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
       views:
         buttons:
           - node_target: main
@@ -46,34 +53,40 @@ steps:
         - name: jupyter_port
           value: reserve_port()
       orchestrator:
-        snapshot_definition:
-          registry_name: docker_hub
-          image_name: jupyter/all-spark-notebook
-          snapshot_name: latest
         type: Orchestrator::MainWithWorkers
         deploy_to_main: true
         deploy_to_workers: false
-        container_user: root
-        container_workdir: /work
-        engine_mount: /etc/ocean
-        data_stores_mount: "{{ engines.jupyter.orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-        main_command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
-        main_env_vars:
-          - name: NB_UID
-            value: "{{ workspace.user.uid }}"
-          - name: NB_GID
-            value: "{{ workspace.user.gid }}"
-          - name: GRANT_SUDO
-            value: yes
-          - name: RESTARTABLE
-            value: yes
-          - name: TINI_SUBREAPER
-            value: true
-          - name: CHOWN_HOME
-            value: yes
-          - name: SPARK_MASTER
-            value: "{{ engines.jupyter.vars.spark_master_url }}"
+        snapshot:
+          registry:
+            name: docker_hub
+          image:
+            name: jupyter/all-spark-notebook
+          name: latest
+        container:
+          user: root
+          workdir: /work
+        mounts:
+          engine: /etc/ocean
+          data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
+          ssh: "/home/{{ workspace.user.name }}/.ssh"
+        nodes:
+          main:
+            command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
+            env_vars:
+              - name: NB_UID
+                value: "{{ workspace.user.uid }}"
+              - name: NB_GID
+                value: "{{ workspace.user.gid }}"
+              - name: GRANT_SUDO
+                value: yes
+              - name: RESTARTABLE
+                value: yes
+              - name: TINI_SUBREAPER
+                value: true
+              - name: CHOWN_HOME
+                value: yes
+              - name: SPARK_MASTER
+                value: "{{ engines.jupyter.vars.spark_master_url }}"
       views:
         buttons:
           - node_target: main
