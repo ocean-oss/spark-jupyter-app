@@ -62,6 +62,8 @@ steps:
         main_env_vars:
           - name: NB_USER
             value: "{{ workspace.user.name }}"
+          - name: NB_GROUP
+            value: "{{ workspace.user.group }}"
           - name: NB_UID
             value: "{{ workspace.user.uid }}"
           - name: NB_GID
