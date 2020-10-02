@@ -27,7 +27,7 @@ steps:
         container_workdir: /work
         engine_mount: /etc/ocean
         data_stores_mount: "{{ engines.spark.orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ engines.spark.workspace.user.name }}/.ssh"
+        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
         main_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
         worker_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
       views:
@@ -54,18 +54,18 @@ steps:
         deploy_to_main: true
         deploy_to_workers: false
         container_user: root
-        container_workdir: "/home/{{ engines.jupyter.workspace.user.name }}"
+        container_workdir: "/home/{{ workspace.user.name }}"
         engine_mount: /etc/ocean
         data_stores_mount: "{{ engines.jupyter.orchestrator.container.workdir }}"
         ssh_mount: "/home/{{ engines.jupyter.workspace.user.name }}/.ssh"
         main_command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
         main_env_vars:
           - name: NB_USER
-            value: "{{ engines.jupyter.workspace.user.name }}"
+            value: "{{ workspace.user.name }}"
           - name: NB_UID
-            value: "{{ engines.jupyter.workspace.user.uid }}"
+            value: "{{ workspace.user.uid }}"
           - name: NB_GID
-            value: "{{ engines.jupyter.workspace.user.gid }}"
+            value: "{{ workspace.user.gid }}"
           - name: GRANT_SUDO
             value: yes
           - name: RESTARTABLE
