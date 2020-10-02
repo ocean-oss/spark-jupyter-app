@@ -6,7 +6,7 @@ steps:
     - name: spark
       variables:
         - name: spark_master_host
-          value: "{{ deployment.nodes.main.private_ip }}"
+          value: "{{ engines.spark.deployment.nodes.main.private_ip }}"
         - name: spark_master_port
           value: reserve_port()
         - name: spark_master_ui_port
@@ -26,23 +26,23 @@ steps:
         container_user: root
         container_workdir: /work
         engine_mount: /etc/ocean
-        data_stores_mount: "{{ orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-        main_command: "sudo {{ orchestrator.container.mounts.engine }}/master_startup.sh"
-        worker_command: "sudo {{ orchestrator.container.mounts.engine }}/worker_startup.sh"
+        data_stores_mount: "{{ engines.spark.orchestrator.container.workdir }}"
+        ssh_mount: "/home/{{ engines.spark.workspace.user.name }}/.ssh"
+        main_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
+        worker_command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
       views:
         buttons:
           - node_target: main
             label: Spark Master UI
-            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_master_ui_port }}"
+            url: "http://{{ engines.spark.views.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_master_ui_port }}"
           - node_target: workers
             label: Spark Worker UI
-            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.spark_worker_ui_port }}"
+            url: "http://{{ engines.spark.views.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_worker_ui_port }}"
   - engines:
     - name: jupyter
       variables:
         - name: spark_master_url
-          value: "spark://{{ app.launched_engines.spark.vars.spark_master_host }}:{{ app.launched_engines.spark.vars.spark_master_port }}"
+          value: "spark://{{ engines.spark.vars.spark_master_host }}:{{ engines.spark.vars.spark_master_port }}"
         - name: jupyter_port
           value: reserve_port()
       orchestrator:
@@ -54,18 +54,18 @@ steps:
         deploy_to_main: true
         deploy_to_workers: false
         container_user: root
-        container_workdir: "/home/{{ workspace.user.name }}"
+        container_workdir: "/home/{{ engines.jupyter.workspace.user.name }}"
         engine_mount: /etc/ocean
-        data_stores_mount: "{{ orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
-        main_command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ vars.jupyter_port }} --no-browser"
+        data_stores_mount: "{{ engines.jupyter.orchestrator.container.workdir }}"
+        ssh_mount: "/home/{{ engines.jupyter.workspace.user.name }}/.ssh"
+        main_command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
         main_env_vars:
           - name: NB_USER
-            value: "{{ workspace.user.name }}"
+            value: "{{ engines.jupyter.workspace.user.name }}"
           - name: NB_UID
-            value: "{{ workspace.user.uid }}"
+            value: "{{ engines.jupyter.workspace.user.uid }}"
           - name: NB_GID
-            value: "{{ workspace.user.gid }}"
+            value: "{{ engines.jupyter.workspace.user.gid }}"
           - name: GRANT_SUDO
             value: yes
           - name: RESTARTABLE
@@ -75,9 +75,9 @@ steps:
           - name: CHOWN_HOME
             value: yes
           - name: SPARK_MASTER
-            value: "{{ vars.spark_master_url }}"
+            value: "{{ engines.jupyter.vars.spark_master_url }}"
       views:
         buttons:
           - node_target: main
             label: Jupyter Notebook
-            url: "http://{{ views.buttons.self.node.public_ip }}:{{ vars.jupyter_port }}"
+            url: "http://{{ engines.jupyter.views.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}"
