@@ -57,7 +57,7 @@ steps:
         container_workdir: "/home/{{ workspace.user.name }}"
         engine_mount: /etc/ocean
         data_stores_mount: "{{ engines.jupyter.orchestrator.container.workdir }}"
-        ssh_mount: "/home/{{ engines.jupyter.workspace.user.name }}/.ssh"
+        ssh_mount: "/home/{{ workspace.user.name }}/.ssh"
         main_command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
         main_env_vars:
           - name: NB_USER
