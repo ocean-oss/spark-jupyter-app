@@ -28,10 +28,10 @@ steps:
         container:
           user: root
           workdir: /work
-        mounts:
-          engine: /etc/ocean
-          data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
-          ssh: "/home/{{ workspace.user.name }}/.ssh"
+          mounts:
+            engine: /etc/ocean
+            data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
+            ssh: "/home/{{ workspace.user.name }}/.ssh"
         nodes:
           main:
             command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
@@ -65,10 +65,10 @@ steps:
         container:
           user: root
           workdir: /work
-        mounts:
-          engine: /etc/ocean
-          data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
-          ssh: "/home/{{ workspace.user.name }}/.ssh"
+          mounts:
+            engine: /etc/ocean
+            data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
+            ssh: "/home/{{ workspace.user.name }}/.ssh"
         nodes:
           main:
             command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
