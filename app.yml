@@ -32,11 +32,11 @@ steps:
             engine: /etc/ocean
             data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
-        nodes:
-          main:
-            command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
-          worker:
-            command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
+          nodes:
+            main:
+              command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
+            worker:
+              command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
       views:
         buttons:
           - node_target: main
@@ -69,24 +69,24 @@ steps:
             engine: /etc/ocean
             data_stores: "{{ engines.spark.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
-        nodes:
-          main:
-            command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
-            env_vars:
-              - name: NB_UID
-                value: "{{ workspace.user.uid }}"
-              - name: NB_GID
-                value: "{{ workspace.user.gid }}"
-              - name: GRANT_SUDO
-                value: yes
-              - name: RESTARTABLE
-                value: yes
-              - name: TINI_SUBREAPER
-                value: true
-              - name: CHOWN_HOME
-                value: yes
-              - name: SPARK_MASTER
-                value: "{{ engines.jupyter.vars.spark_master_url }}"
+          nodes:
+            main:
+              command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
+              env_vars:
+                - name: NB_UID
+                  value: "{{ workspace.user.uid }}"
+                - name: NB_GID
+                  value: "{{ workspace.user.gid }}"
+                - name: GRANT_SUDO
+                  value: yes
+                - name: RESTARTABLE
+                  value: yes
+                - name: TINI_SUBREAPER
+                  value: true
+                - name: CHOWN_HOME
+                  value: yes
+                - name: SPARK_MASTER
+                  value: "{{ engines.jupyter.vars.spark_master_url }}"
       views:
         buttons:
           - node_target: main
