@@ -37,14 +37,14 @@ steps:
               command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
             worker:
               command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
-      views:
+      ui:
         buttons:
           - node_target: main
             label: Spark Master UI
-            url: "http://{{ engines.spark.views.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_master_ui_port }}"
+            url: "http://{{ engines.spark.ui.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_master_ui_port }}"
           - node_target: workers
             label: Spark Worker UI
-            url: "http://{{ engines.spark.views.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_worker_ui_port }}"
+            url: "http://{{ engines.spark.ui.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_worker_ui_port }}"
   - engines:
     - name: jupyter
       vars:
@@ -87,8 +87,8 @@ steps:
                   value: yes
                 - name: SPARK_MASTER
                   value: "{{ engines.jupyter.vars.spark_master_url }}"
-      views:
+      ui:
         buttons:
           - node_target: main
             label: Jupyter Notebook
-            url: "http://{{ engines.jupyter.views.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}"
+            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}"
