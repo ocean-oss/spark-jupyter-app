@@ -6,7 +6,7 @@ steps:
     - name: spark
       vars:
         - name: spark_master_host
-          value: "{{ engines.spark.deployment.container.nodes.main.private_ip }}"
+          value: "{{ engines.spark.deployment.nodes.main.private_ip }}"
         - name: spark_master_port
           value: reserve_port()
         - name: spark_master_ui_port
