@@ -99,4 +99,4 @@ steps:
         buttons:
           - node_target: main
             label: Jupyter Notebook
-            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}"
+            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}?token={{ engines.jupyter.vars.jupyter_token }}"
