@@ -37,8 +37,26 @@ steps:
           nodes:
             main:
               command: "{{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
+              env_vars:
+                - name: NB_UID
+                  value: "{{ workspace.user.uid }}"
+                - name: NB_GID
+                  value: "{{ workspace.user.gid }}"
+                - name: CHOWN_HOME
+                  value: yes
+                - name: GRANT_SUDO
+                  value: yes
             worker:
               command: "{{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
+              env_vars:
+                - name: NB_UID
+                  value: "{{ workspace.user.uid }}"
+                - name: NB_GID
+                  value: "{{ workspace.user.gid }}"
+                - name: CHOWN_HOME
+                  value: yes
+                - name: GRANT_SUDO
+                  value: yes
       ui:
         buttons:
           - node_target: main
