@@ -79,7 +79,7 @@ steps:
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "{{ engines.jupyter.orchestrator.container.mounts.engine }}/master_startup.sh"
+              command: "{{ engines.jupyter.orchestrator.container.mounts.engine }}/startup.sh"
               env_vars:
                 - name: JUPYTER_ENABLE_LAB
                   value: yes
