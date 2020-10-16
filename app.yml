@@ -48,10 +48,10 @@ steps:
       ui:
         buttons:
           - node_target: main
-            label: Spark Master UI
+            label: Spark Master Dashboard
             url: "http://{{ engines.spark.ui.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_master_ui_port }}"
           - node_target: workers
-            label: Spark Worker UI
+            label: Spark Worker Dashboard
             url: "http://{{ engines.spark.ui.buttons.self.node.public_ip }}:{{ engines.spark.vars.spark_worker_ui_port }}"
   - engines:
     - name: jupyter
