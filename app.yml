@@ -39,12 +39,12 @@ steps:
               command: "{{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
-                  values: true
+                  value: true
             worker:
               command: "{{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
-                  values: true
+                  value: true
       ui:
         buttons:
           - node_target: main
