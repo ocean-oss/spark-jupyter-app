@@ -15,6 +15,8 @@ steps:
           value: reserve_port()
         - name: spark_worker_ui_port
           value: reserve_port()
+        - name: spark_master_url
+          value: "spark://{{ engines.spark.vars.spark_master_host }}:{{ engines.spark.vars.spark_master_port }}"
       orchestrator:
         type: Orchestrator::MainWithWorkers
         deploy_to_main: true
@@ -34,9 +36,9 @@ steps:
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
+              command: "{{ engines.spark.orchestrator.container.mounts.engine }}/master_startup.sh"
             worker:
-              command: "sudo {{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
+              command: "{{ engines.spark.orchestrator.container.mounts.engine }}/worker_startup.sh"
       ui:
         buttons:
           - node_target: main
@@ -48,10 +50,10 @@ steps:
   - engines:
     - name: jupyter
       vars:
-        - name: spark_master_url
-          value: "spark://{{ engines.spark.vars.spark_master_host }}:{{ engines.spark.vars.spark_master_port }}"
         - name: jupyter_port
           value: reserve_port()
+        - name: jupyter_token
+          value: generate_uuid()
       orchestrator:
         type: Orchestrator::MainWithWorkers
         deploy_to_main: true
@@ -71,22 +73,22 @@ steps:
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "start.sh jupyter lab --NotebookApp.token=\"\" --NotebookApp.password=\"\" --NotebookApp.port={{ engines.jupyter.vars.jupyter_port }} --no-browser"
+              command: "{{ engines.jupyter.orchestrator.container.mounts.engine }}/master_startup.sh"
               env_vars:
+                - name: JUPYTER_ENABLE_LAB
+                  value: yes
                 - name: NB_UID
                   value: "{{ workspace.user.uid }}"
                 - name: NB_GID
                   value: "{{ workspace.user.gid }}"
+                - name: CHOWN_HOME
+                  value: yes
                 - name: GRANT_SUDO
                   value: yes
                 - name: RESTARTABLE
                   value: yes
-                - name: TINI_SUBREAPER
-                  value: true
-                - name: CHOWN_HOME
-                  value: yes
                 - name: SPARK_MASTER
-                  value: "{{ engines.jupyter.vars.spark_master_url }}"
+                  value: "{{ engines.spark.vars.spark_master_url }}"
       ui:
         buttons:
           - node_target: main
