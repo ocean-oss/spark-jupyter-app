@@ -8,9 +8,9 @@ steps:
         - name: private_ip
           value: "{{ engines.spark-master.deployment.nodes.main.private_ip }}"
         - name: port
-          value: reserve_port()
+          value: "{% reserve_public_port %}"
         - name: dashboard_port
-          value: reserve_port()
+          value: "{% reserve_public_port %}"
         - name: url
           value: "spark://{{ engines.spark-master.vars.private_ip }}:{{ engines.spark-master.vars.port }}"
       orchestrator:
@@ -45,9 +45,9 @@ steps:
       - name: spark-worker
         vars:
           - name: port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
           - name: dashboard_port
-            value: reserve_port()
+            value: "{% reserve_public_port %}"
         orchestrator:
           type: Orchestrator::MainWithWorkers
           deploy_to_main: false
@@ -80,9 +80,9 @@ steps:
     - name: jupyter
       vars:
         - name: jupyter_port
-          value: reserve_port()
+          value: "{% reserve_public_port %}"
         - name: jupyter_token
-          value: generate_uuid()
+          value: "{% generate_uuid %}"
       orchestrator:
         type: Orchestrator::MainWithWorkers
         deploy_to_main: true
