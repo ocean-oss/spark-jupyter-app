@@ -79,9 +79,9 @@ steps:
   - engines:
     - name: jupyter
       vars:
-        - name: jupyter_port
+        - name: port
           value: "{% reserve_public_port %}"
-        - name: jupyter_token
+        - name: token
           value: "{% generate_uuid %}"
       orchestrator:
         type: Orchestrator::MainWithWorkers
@@ -122,4 +122,4 @@ steps:
         buttons:
           - node_target: main
             label: Jupyter Notebook
-            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.jupyter_port }}?token={{ engines.jupyter.vars.jupyter_token }}"
+            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.port }}?token={{ engines.jupyter.vars.token }}"
