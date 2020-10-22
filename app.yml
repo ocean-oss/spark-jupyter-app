@@ -40,33 +40,33 @@ steps:
             label: Spark Master Dashboard
             url: "http://{{ engines.spark-master.ui.buttons.self.node.public_ip }}:{{ engines.spark-master.vars.dashboard_port }}"
   - engines:
-      - name: spark-worker
-        vars:
-          - name: port
-            value: "{% reserve_private_port %}"
-          - name: dashboard_port
-            value: "{% reserve_public_port %}"
-        orchestrator:
-          deployment_strategy: workers_fill_pool
-          snapshot_name: spark
-          container:
-            user: root
-            workdir: /work
-            mounts:
-              engine: /etc/ocean
-              data_stores: "{{ engines.spark-worker.orchestrator.container.workdir }}"
-              ssh: "/home/{{ workspace.user.name }}/.ssh"
-            nodes:
-              worker:
-                command: "{{ engines.spark-worker.orchestrator.container.mounts.engine }}/startup.sh"
-                env_vars:
-                  - name: SPARK_NO_DAEMONIZE
-                    value: true
-        ui:
-          buttons:
-            - node_target: workers
-              label: Spark Worker Dashboard
-              url: "http://{{ engines.spark-worker.ui.buttons.self.node.public_ip }}:{{ engines.spark-worker.vars.dashboard_port }}"
+    - name: spark-worker
+      vars:
+        - name: port
+          value: "{% reserve_private_port %}"
+        - name: dashboard_port
+          value: "{% reserve_public_port %}"
+      orchestrator:
+        deployment_strategy: workers_fill_pool
+        snapshot_name: spark
+        container:
+          user: root
+          workdir: /work
+          mounts:
+            engine: /etc/ocean
+            data_stores: "{{ engines.spark-worker.orchestrator.container.workdir }}"
+            ssh: "/home/{{ workspace.user.name }}/.ssh"
+          nodes:
+            worker:
+              command: "{{ engines.spark-worker.orchestrator.container.mounts.engine }}/startup.sh"
+              env_vars:
+                - name: SPARK_NO_DAEMONIZE
+                  value: true
+      ui:
+        buttons:
+          - node_target: workers
+            label: Spark Worker Dashboard
+            url: "http://{{ engines.spark-worker.ui.buttons.self.node.public_ip }}:{{ engines.spark-worker.vars.dashboard_port }}"
     - name: jupyter
       vars:
         - name: port
