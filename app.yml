@@ -1,6 +1,11 @@
 ---
 ocean:
   version: "1"
+snapshots:
+  - name: spark
+    registry: docker_hub
+    image: jupyter/all-spark-notebook
+    tag: latest
 steps:
   - engines:
     - name: spark-master
@@ -8,21 +13,14 @@ steps:
         - name: private_ip
           value: "{{ engines.spark-master.deployment.nodes.main.private_ip }}"
         - name: port
-          value: "{% reserve_public_port %}"
+          value: "{% reserve_private_port %}"
         - name: dashboard_port
           value: "{% reserve_public_port %}"
         - name: url
           value: "spark://{{ engines.spark-master.vars.private_ip }}:{{ engines.spark-master.vars.port }}"
       orchestrator:
-        type: Orchestrator::MainWithWorkers
-        deploy_to_main: true
-        deploy_to_workers: false
-        snapshot:
-          registry:
-            name: docker_hub
-          image:
-            name: jupyter/all-spark-notebook
-          name: latest
+        deployment_strategy: main
+        snapshot_name: spark
         container:
           user: root
           workdir: /work
@@ -45,19 +43,12 @@ steps:
       - name: spark-worker
         vars:
           - name: port
-            value: "{% reserve_public_port %}"
+            value: "{% reserve_private_port %}"
           - name: dashboard_port
             value: "{% reserve_public_port %}"
         orchestrator:
-          type: Orchestrator::MainWithWorkers
-          deploy_to_main: false
-          deploy_to_workers: true
-          snapshot:
-            registry:
-              name: docker_hub
-            image:
-              name: jupyter/all-spark-notebook
-            name: latest
+          deployment_strategy: workers_fill_pool
+          snapshot_name: spark
           container:
             user: root
             workdir: /work
@@ -76,7 +67,6 @@ steps:
             - node_target: workers
               label: Spark Worker Dashboard
               url: "http://{{ engines.spark-worker.ui.buttons.self.node.public_ip }}:{{ engines.spark-worker.vars.dashboard_port }}"
-  - engines:
     - name: jupyter
       vars:
         - name: port
@@ -84,15 +74,8 @@ steps:
         - name: token
           value: "{% generate_uuid %}"
       orchestrator:
-        type: Orchestrator::MainWithWorkers
-        deploy_to_main: true
-        deploy_to_workers: false
-        snapshot:
-          registry:
-            name: docker_hub
-          image:
-            name: jupyter/all-spark-notebook
-          name: latest
+        deployment_strategy: main
+        snapshot_name: spark
         container:
           user: root
           workdir: /work
@@ -105,17 +88,17 @@ steps:
               command: "{{ engines.jupyter.orchestrator.container.mounts.engine }}/startup.sh"
               env_vars:
                 - name: JUPYTER_ENABLE_LAB
-                  value: yes
+                  value: "yes"
                 - name: NB_UID
                   value: "{{ workspace.user.uid }}"
                 - name: NB_GID
                   value: "{{ workspace.user.gid }}"
                 - name: CHOWN_HOME
-                  value: yes
+                  value: "yes"
                 - name: GRANT_SUDO
-                  value: yes
+                  value: "yes"
                 - name: RESTARTABLE
-                  value: yes
+                  value: "yes"
                 - name: SPARK_MASTER
                   value: "{{ engines.spark-master.vars.url }}"
       ui:
