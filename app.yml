@@ -8,16 +8,16 @@ snapshots:
     tag: latest
 steps:
   - engines:
-    - name: spark-master
+    - name: spark_master
       vars:
         - name: private_ip
-          value: "{{ engines.spark-master.deployment.nodes.main.private_ip }}"
+          value: "{{ engines.spark_master.deployment.nodes.main.private_ip }}"
         - name: port
           value: "{% reserve_private_port %}"
         - name: dashboard_port
           value: "{% reserve_public_port %}"
         - name: url
-          value: "spark://{{ engines.spark-master.vars.private_ip }}:{{ engines.spark-master.vars.port }}"
+          value: "spark://{{ engines.spark_master.vars.private_ip }}:{{ engines.spark_master.vars.port }}"
       orchestrator:
         deployment_strategy: main
         snapshot_name: spark
@@ -25,12 +25,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            engine: /etc/ocean
-            data_stores: "{{ engines.spark-master.orchestrator.container.workdir }}"
+            files:
+              - name: spakr_master
+                app_path: spark_master
+                container_path: /ocean/etc/spark_master
+                readonly: true
+            data_stores: "{{ engines.spark_master.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "{{ engines.spark-master.orchestrator.container.mounts.engine }}/startup.sh"
+              command: "{{ engines.spark_master.orchestrator.container.mounts.files.spark_master.container_path }}/startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
                   value: true
@@ -38,9 +42,9 @@ steps:
         buttons:
           - node_target: main
             label: Spark Master Dashboard
-            url: "http://{{ engines.spark-master.ui.buttons.self.node.public_ip }}:{{ engines.spark-master.vars.dashboard_port }}"
+            url: "http://{{ engines.spark_master.ui.buttons.self.node.public_ip }}:{{ engines.spark_master.vars.dashboard_port }}"
   - engines:
-    - name: spark-worker
+    - name: spark_worker
       vars:
         - name: port
           value: "{% reserve_private_port %}"
@@ -53,12 +57,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            engine: /etc/ocean
-            data_stores: "{{ engines.spark-worker.orchestrator.container.workdir }}"
+            files:
+              - name: spakr_worker
+                app_path: spark_worker
+                container_path: /ocean/etc/spark_worker
+                readonly: true
+            data_stores: "{{ engines.spark_worker.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             worker:
-              command: "{{ engines.spark-worker.orchestrator.container.mounts.engine }}/startup.sh"
+              command: "{{ engines.spark_worker.orchestrator.container.mounts.files.spark_worker.container_path }}/startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
                   value: true
@@ -66,7 +74,7 @@ steps:
         buttons:
           - node_target: workers
             label: Spark Worker Dashboard
-            url: "http://{{ engines.spark-worker.ui.buttons.self.node.public_ip }}:{{ engines.spark-worker.vars.dashboard_port }}"
+            url: "http://{{ engines.spark_worker.ui.buttons.self.node.public_ip }}:{{ engines.spark_worker.vars.dashboard_port }}"
     - name: jupyter
       vars:
         - name: port
@@ -80,12 +88,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            engine: /etc/ocean
+            files:
+              - name: jupyter
+                app_path: jupyter
+                container_path: /ocean/etc/jupyter
+                readonly: true
             data_stores: "{{ engines.jupyter.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "{{ engines.jupyter.orchestrator.container.mounts.engine }}/startup.sh"
+              command: "{{ engines.jupyter.orchestrator.container.mounts.files.jupyter.container_path }}/startup.sh"
               env_vars:
                 - name: JUPYTER_ENABLE_LAB
                   value: "yes"
@@ -100,7 +112,7 @@ steps:
                 - name: RESTARTABLE
                   value: "yes"
                 - name: SPARK_MASTER
-                  value: "{{ engines.spark-master.vars.url }}"
+                  value: "{{ engines.spark_master.vars.url }}"
       ui:
         buttons:
           - node_target: main
