@@ -25,16 +25,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            files:
+            app_files:
               - name: spark_master
-                app_path: spark_master
+                app_files_path: spark_master
                 container_path: /ocean/etc/spark_master
                 readonly: true
             data_stores: "{{ engines.spark_master.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "{{ engines.spark_master.orchestrator.container.mounts.files.spark_master.container_path }}/startup.sh"
+              command: "{{ engines.spark_master.orchestrator.container.mounts.app_files.spark_master.container_path }}/startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
                   value: true
@@ -57,16 +57,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            files:
+            app_files:
               - name: spark_worker
-                app_path: spark_worker
+                app_files_path: spark_worker
                 container_path: /ocean/etc/spark_worker
                 readonly: true
             data_stores: "{{ engines.spark_worker.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             worker:
-              command: "{{ engines.spark_worker.orchestrator.container.mounts.files.spark_worker.container_path }}/startup.sh"
+              command: "{{ engines.spark_worker.orchestrator.container.mounts.app_files.spark_worker.container_path }}/startup.sh"
               env_vars:
                 - name: SPARK_NO_DAEMONIZE
                   value: true
@@ -88,16 +88,16 @@ steps:
           user: root
           workdir: /work
           mounts:
-            files:
+            app_files:
               - name: jupyter
-                app_path: jupyter
+                app_files_path: jupyter
                 container_path: /ocean/etc/jupyter
                 readonly: true
             data_stores: "{{ engines.jupyter.orchestrator.container.workdir }}"
             ssh: "/home/{{ workspace.user.name }}/.ssh"
           nodes:
             main:
-              command: "{{ engines.jupyter.orchestrator.container.mounts.files.jupyter.container_path }}/startup.sh"
+              command: "{{ engines.jupyter.orchestrator.container.mounts.app_files.jupyter.container_path }}/startup.sh"
               env_vars:
                 - name: JUPYTER_ENABLE_LAB
                   value: "yes"
