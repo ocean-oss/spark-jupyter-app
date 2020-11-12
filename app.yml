@@ -13,7 +13,7 @@ steps:
       networking:
         dns:
           enabled: true
-          default_value: ray
+          default_value: spark
           label: Spark Dashboard URL
         ports:
         - name: master
