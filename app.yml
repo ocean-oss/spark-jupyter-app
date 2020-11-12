@@ -80,6 +80,16 @@ steps:
             label: Spark Worker Dashboard
             url: "http://{{ engines.spark_worker.ui.buttons.self.node.public_ip }}:{{ engines.spark_worker.networking.ports.dashboard.value }}"
     - name: jupyter
+      settings:
+        - name: mode
+          label: Jupyter Mode
+          style: dropdown
+          default_value: 'lab'
+          options:
+            - value: lab
+              label: 'Lab'
+            - value: notebook
+              label: 'Notebook'
       networking:
         dns:
           enabled: true
@@ -96,7 +106,7 @@ steps:
       container:
         image_name: spark
         user: root
-        workdir: /work
+        workdir: "/home/{{ workspace.user.name }}"
         mounts:
           app_files:
             - name: jupyter
@@ -108,11 +118,15 @@ steps:
         command: "{{ engines.jupyter.orchestrator.container.mounts.app_files.jupyter.container_path }}/startup.sh"
         env_vars:
           - name: JUPYTER_ENABLE_LAB
-            value: "yes"
+            value: "{% if engines.jupyter.settings.mode.value == 'lab' %}yes{% else %}no{% endif %}"
           - name: NB_UID
             value: "{{ workspace.user.uid }}"
           - name: NB_GID
             value: "{{ workspace.user.gid }}"
+          - name: NB_USER
+            value: "{{ workspace.user.name }}"
+          - name: NB_GROUP
+            value: "{{ workspace.user.group }}"
           - name: CHOWN_HOME
             value: "yes"
           - name: GRANT_SUDO
