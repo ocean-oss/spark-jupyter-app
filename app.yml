@@ -1,7 +1,7 @@
 ---
 ocean:
   version: "1"
-snapshots:
+images:
   - name: spark
     registry: docker_hub
     image: jupyter/all-spark-notebook
@@ -9,112 +9,119 @@ snapshots:
 steps:
   - engines:
     - name: spark_master
+      networking:
+        dns:
+          enabled: true
+          default_value: ray
+          label: Spark Dashboard URL
+        ports:
+        - name: master
+          public: false
+        - name: dashboard
+          public: true
       vars:
         - name: private_ip
           value: "{{ engines.spark_master.deployment.nodes.main.private_ip }}"
-        - name: port
-          value: "{% reserve_private_port %}"
-        - name: dashboard_port
-          value: "{% reserve_public_port %}"
         - name: url
-          value: "spark://{{ engines.spark_master.vars.private_ip }}:{{ engines.spark_master.vars.port }}"
-      orchestrator:
-        deployment_strategy: main
-        snapshot_name: spark
-        container:
-          user: root
-          workdir: /work
-          mounts:
-            app_files:
-              - name: spark_master
-                app_files_path: spark_master
-                container_path: /ocean/etc/spark_master
-                readonly: true
-            data_stores: "{{ engines.spark_master.orchestrator.container.workdir }}"
-            ssh: "/home/{{ workspace.user.name }}/.ssh"
-          nodes:
-            main:
-              command: "{{ engines.spark_master.orchestrator.container.mounts.app_files.spark_master.container_path }}/startup.sh"
-              env_vars:
-                - name: SPARK_NO_DAEMONIZE
-                  value: true
+          value: "spark://{{ engines.spark_master.vars.private_ip }}:{{ engines.spark_master.networking.ports.master.value }}"
+      deployment:
+        strategy: main
+      container:
+        image_name: spark
+        user: root
+        workdir: /work
+        mounts:
+          app_files:
+            - name: spark_master
+              app_files_path: spark_master
+              container_path: /ocean/etc/spark_master
+              readonly: true
+          data_stores: "{{ engines.spark_master.orchestrator.container.workdir }}"
+          ssh: "/home/{{ workspace.user.name }}/.ssh"
+        command: "{{ engines.spark_master.orchestrator.container.mounts.app_files.spark_master.container_path }}/startup.sh"
+        env_vars:
+          - name: SPARK_NO_DAEMONIZE
+            value: true
       ui:
         buttons:
           - node_target: main
             label: Spark Master Dashboard
-            url: "http://{{ engines.spark_master.ui.buttons.self.node.public_ip }}:{{ engines.spark_master.vars.dashboard_port }}"
+            url: "http://{{ engines.spark_master.networking.dns.url }}:{{ engines.spark_master.networking.ports.dashboard.value }}"
   - engines:
     - name: spark_worker
-      vars:
-        - name: port
-          value: "{% reserve_private_port %}"
-        - name: dashboard_port
-          value: "{% reserve_public_port %}"
-      orchestrator:
-        deployment_strategy: workers_fill_pool
-        snapshot_name: spark
-        container:
-          user: root
-          workdir: /work
-          mounts:
-            app_files:
-              - name: spark_worker
-                app_files_path: spark_worker
-                container_path: /ocean/etc/spark_worker
-                readonly: true
-            data_stores: "{{ engines.spark_worker.orchestrator.container.workdir }}"
-            ssh: "/home/{{ workspace.user.name }}/.ssh"
-          nodes:
-            worker:
-              command: "{{ engines.spark_worker.orchestrator.container.mounts.app_files.spark_worker.container_path }}/startup.sh"
-              env_vars:
-                - name: SPARK_NO_DAEMONIZE
-                  value: true
+      networking:
+        ports:
+          - name: worker
+            public: false
+          - name: dashboard
+            public: true
+      deployment:
+        strategy: workers_fill_pool
+      container:
+        image_name: spark
+        user: root
+        workdir: /work
+        mounts:
+          app_files:
+            - name: spark_worker
+              app_files_path: spark_worker
+              container_path: /ocean/etc/spark_worker
+              readonly: true
+          data_stores: "{{ engines.spark_worker.orchestrator.container.workdir }}"
+          ssh: "/home/{{ workspace.user.name }}/.ssh"
+        command: "{{ engines.spark_worker.orchestrator.container.mounts.app_files.spark_worker.container_path }}/startup.sh"
+        env_vars:
+          - name: SPARK_NO_DAEMONIZE
+            value: true
       ui:
         buttons:
           - node_target: workers
             label: Spark Worker Dashboard
-            url: "http://{{ engines.spark_worker.ui.buttons.self.node.public_ip }}:{{ engines.spark_worker.vars.dashboard_port }}"
+            url: "http://{{ engines.spark_worker.ui.buttons.self.node.public_ip }}:{{ engines.spark_worker.networking.ports.dashboard.value }}"
     - name: jupyter
+      networking:
+        dns:
+          enabled: true
+          default_value: jupyter
+          label: Jupyter URL
+        ports:
+          - name: jupyter
+            public: true
       vars:
-        - name: port
-          value: "{% reserve_public_port %}"
         - name: token
           value: "{% generate_uuid %}"
-      orchestrator:
-        deployment_strategy: main
-        snapshot_name: spark
-        container:
-          user: root
-          workdir: /work
-          mounts:
-            app_files:
-              - name: jupyter
-                app_files_path: jupyter
-                container_path: /ocean/etc/jupyter
-                readonly: true
-            data_stores: "{{ engines.jupyter.orchestrator.container.workdir }}"
-            ssh: "/home/{{ workspace.user.name }}/.ssh"
-          nodes:
-            main:
-              command: "{{ engines.jupyter.orchestrator.container.mounts.app_files.jupyter.container_path }}/startup.sh"
-              env_vars:
-                - name: JUPYTER_ENABLE_LAB
-                  value: "yes"
-                - name: NB_UID
-                  value: "{{ workspace.user.uid }}"
-                - name: NB_GID
-                  value: "{{ workspace.user.gid }}"
-                - name: CHOWN_HOME
-                  value: "yes"
-                - name: GRANT_SUDO
-                  value: "yes"
-                - name: RESTARTABLE
-                  value: "yes"
-                - name: SPARK_MASTER
-                  value: "{{ engines.spark_master.vars.url }}"
+      deployment:
+        strategy: main
+      container:
+        image_name: spark
+        user: root
+        workdir: /work
+        mounts:
+          app_files:
+            - name: jupyter
+              app_files_path: jupyter
+              container_path: /ocean/etc/jupyter
+              readonly: true
+          data_stores: "{{ engines.jupyter.orchestrator.container.workdir }}"
+          ssh: "/home/{{ workspace.user.name }}/.ssh"
+        command: "{{ engines.jupyter.orchestrator.container.mounts.app_files.jupyter.container_path }}/startup.sh"
+        env_vars:
+          - name: JUPYTER_ENABLE_LAB
+            value: "yes"
+          - name: NB_UID
+            value: "{{ workspace.user.uid }}"
+          - name: NB_GID
+            value: "{{ workspace.user.gid }}"
+          - name: CHOWN_HOME
+            value: "yes"
+          - name: GRANT_SUDO
+            value: "yes"
+          - name: RESTARTABLE
+            value: "yes"
+          - name: SPARK_MASTER
+            value: "{{ engines.spark_master.vars.url }}"
       ui:
         buttons:
           - node_target: main
             label: Jupyter Notebook
-            url: "http://{{ engines.jupyter.ui.buttons.self.node.public_ip }}:{{ engines.jupyter.vars.port }}?token={{ engines.jupyter.vars.token }}"
+            url: "http://{{ engines.jupyter.networking.dns.url }}:{{ engines.jupyter.networking.ports.jupyter.value }}?token={{ engines.jupyter.vars.token }}"
