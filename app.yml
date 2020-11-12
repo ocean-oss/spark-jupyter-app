@@ -6,6 +6,7 @@ images:
     registry: docker_hub
     image: jupyter/all-spark-notebook
     tag: latest
+    snapshottable: true
 steps:
   - engines:
     - name: spark_master
