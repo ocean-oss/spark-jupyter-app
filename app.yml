@@ -37,9 +37,9 @@ steps:
               app_files_path: spark_master
               container_path: /ocean/etc/spark_master
               readonly: true
-          data_stores: "{{ engines.spark_master.orchestrator.container.workdir }}"
+          data_stores: "{{ engines.spark_master.container.workdir }}"
           ssh: "/home/{{ workspace.user.name }}/.ssh"
-        command: "{{ engines.spark_master.orchestrator.container.mounts.app_files.spark_master.container_path }}/startup.sh"
+        command: "{{ engines.spark_master.container.mounts.app_files.spark_master.container_path }}/startup.sh"
         env_vars:
           - name: SPARK_NO_DAEMONIZE
             value: true
@@ -68,9 +68,9 @@ steps:
               app_files_path: spark_worker
               container_path: /ocean/etc/spark_worker
               readonly: true
-          data_stores: "{{ engines.spark_worker.orchestrator.container.workdir }}"
+          data_stores: "{{ engines.spark_worker.container.workdir }}"
           ssh: "/home/{{ workspace.user.name }}/.ssh"
-        command: "{{ engines.spark_worker.orchestrator.container.mounts.app_files.spark_worker.container_path }}/startup.sh"
+        command: "{{ engines.spark_worker.container.mounts.app_files.spark_worker.container_path }}/startup.sh"
         env_vars:
           - name: SPARK_NO_DAEMONIZE
             value: true
@@ -113,9 +113,9 @@ steps:
               app_files_path: jupyter
               container_path: /ocean/etc/jupyter
               readonly: true
-          data_stores: "{{ engines.jupyter.orchestrator.container.workdir }}"
+          data_stores: "{{ engines.jupyter.container.workdir }}"
           ssh: "/home/{{ workspace.user.name }}/.ssh"
-        command: "{{ engines.jupyter.orchestrator.container.mounts.app_files.jupyter.container_path }}/startup.sh"
+        command: "{{ engines.jupyter.container.mounts.app_files.jupyter.container_path }}/startup.sh"
         env_vars:
           - name: JUPYTER_ENABLE_LAB
             value: "{% if engines.jupyter.settings.mode.value == 'lab' %}yes{% else %}no{% endif %}"
