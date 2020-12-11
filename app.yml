@@ -6,7 +6,6 @@ images:
     registry: docker_hub
     image: jupyter/all-spark-notebook
     tag: latest
-    snapshottable: true
 steps:
   - engines:
     - name: spark_master
@@ -28,7 +27,9 @@ steps:
       deployment:
         strategy: main
       container:
-        image_name: spark
+        image:
+          name: spark
+          editable: true
         user: root
         workdir: /work
         mounts:
@@ -59,7 +60,9 @@ steps:
       deployment:
         strategy: workers_fill_pool
       container:
-        image_name: spark
+        image:
+          name: spark
+          editable: true
         user: root
         workdir: /work
         mounts:
@@ -83,7 +86,7 @@ steps:
       settings:
         - name: mode
           label: Jupyter Mode
-          style: dropdown
+          type: dropdown
           default_value: 'lab'
           options:
             - value: lab
@@ -104,7 +107,9 @@ steps:
       deployment:
         strategy: main
       container:
-        image_name: spark
+        image:
+          name: spark
+          editable: true
         user: root
         workdir: "/home/{{ workspace.user.name }}"
         mounts:
